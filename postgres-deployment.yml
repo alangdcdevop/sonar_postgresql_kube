@@ -1,0 +1,52 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  selector:
+    matchLabels:
+      app: postgres-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-deployment
+    spec:
+      containers:
+      - name: master
+        image: postgres:latest
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_PASSWORD
+            value: sonar
+          - name: POSTGRES_USER
+            value: sonar
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - mountPath:  "/var/lib/postgresql/data"
+          name: psql-pv
+      restartPolicy: Always
+      volumes:
+      - name: psql-pv
+        persistentVolumeClaim:
+          claimName: psql-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: psql-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+
+
+
+
+
+
